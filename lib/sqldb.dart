@@ -18,7 +18,7 @@ class SqlDb {
     String path = join(databasesPath, 'demo.db');
     Database database = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -26,33 +26,49 @@ class SqlDb {
   }
 
   _onCreate(Database db, int version) async {
-    await db.execute(
-        'CREATE TABLE Notes ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "note" TEXT NOT NULL)');
+    await db.execute('''
+        CREATE TABLE Notes (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "title" TEXT NOT NULL,
+        "note" TEXT NOT NULL
+        )''');
   }
 
-  _onUpgrade(Database db, int oldVersion, int newVersion) async {}
+  // When the version number is changed
+  _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    await db.execute('''
+        ALTER TABLE Notes ADD COLUMN
+        "color" TEXT NOT NULL
+        ''');
+  }
 
-  readData({required String sql}) async {
+  readData(String sql) async {
     Database? database = await db;
     List<Map<String, Object?>> response = await database!.rawQuery(sql);
     return response;
   }
 
-  insertData({required String sql}) async {
+  insertData(String sql) async {
     Database? database = await db;
     int response = await database!.rawInsert(sql);
     return response;
   }
 
-  updateData({required String sql}) async {
+  updateData(String sql) async {
     Database? database = await db;
     int response = await database!.rawUpdate(sql);
     return response;
   }
 
-  deleteData({required String sql}) async {
+  deleteData(String sql) async {
     Database? database = await db;
     int response = await database!.rawDelete(sql);
     return response;
+  }
+
+  deleteDb() async {
+    String databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'demo.db');
+    await deleteDatabase(path);
   }
 }

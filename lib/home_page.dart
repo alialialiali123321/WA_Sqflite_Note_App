@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 import 'sqldb.dart';
@@ -14,6 +12,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   SqlDb sqlDb = SqlDb();
 
+  Future<List<Map<String, Object?>>> readData() async {
+    List<Map<String, Object?>> response =
+        await sqlDb.readData('SELECT * FROM Notes');
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,51 +25,37 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         title: const Text('Home Page'),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            MaterialButton(
-              color: Colors.red,
-              textColor: Colors.white,
-              child: const Text('Insert Data'),
-              onPressed: () async {
-                int response = await sqlDb.insertData(
-                    sql: 'INSERT INTO "Notes" ("note") VALUES ("note one")');
-                log(response.toString());
-              },
-            ),
-            MaterialButton(
-              color: Colors.red,
-              textColor: Colors.white,
-              child: const Text('Read Data'),
-              onPressed: () async {
-                List<Map<String, Object?>> response =
-                    await sqlDb.readData(sql: 'SELECT * FROM "Notes"');
-                log(response.toString());
-              },
-            ),
-            MaterialButton(
-              color: Colors.red,
-              textColor: Colors.white,
-              child: const Text('Delete Data'),
-              onPressed: () async {
-                int response = await sqlDb.deleteData(
-                    sql: 'DELETE FROM "Notes" WHERE id = 2');
-                log(response.toString());
-              },
-            ),
-            MaterialButton(
-              color: Colors.red,
-              textColor: Colors.white,
-              child: const Text('Update Data'),
-              onPressed: () async {
-                int response = await sqlDb.updateData(
-                    sql: 'UPDATE "Notes" SET "note" = "note six" WHERE id = 1');
-                log(response.toString());
-              },
-            ),
-          ],
-        ),
+      body: ListView(
+        children: [
+          // ElevatedButton(
+          //     onPressed: () {
+          //       sqlDb.deleteDb();
+          //     },
+          //     child: const Text('Delete')),
+          FutureBuilder(
+            future: readData(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<Map<String, Object?>>> snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      child: ListTile(
+                        title: Text('${snapshot.data![index]['note']}'),
+                      ),
+                    );
+                  },
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          )
+        ],
       ),
     );
   }
