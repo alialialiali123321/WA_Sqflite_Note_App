@@ -18,7 +18,7 @@ class SqlDb {
     String path = join(databasesPath, 'demo.db');
     Database database = await openDatabase(
       path,
-      version: 2,
+      version: 1,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -30,7 +30,8 @@ class SqlDb {
         CREATE TABLE Notes (
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         "title" TEXT NOT NULL,
-        "note" TEXT NOT NULL
+        "note" TEXT NOT NULL,
+        "color" TEXT NOT NULL
         )''');
   }
 

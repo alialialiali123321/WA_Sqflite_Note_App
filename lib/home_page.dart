@@ -38,17 +38,17 @@ class _HomePageState extends State<HomePage> {
                 AsyncSnapshot<List<Map<String, Object?>>> snapshot) {
               if (snapshot.hasData) {
                 return ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      child: ListTile(
-                        title: Text('${snapshot.data![index]['note']}'),
-                      ),
-                    );
-                  },
-                );
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Card(
+                          child: ListTile(
+                        title: Text('${snapshot.data![index]['title']}'),
+                        subtitle: Text('${snapshot.data![index]['note']}'),
+                        trailing: Text('${snapshot.data![index]['color']}'),
+                      ));
+                    });
               }
               return const Center(
                 child: CircularProgressIndicator(),
@@ -56,6 +56,12 @@ class _HomePageState extends State<HomePage> {
             },
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed('AddNote');
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
