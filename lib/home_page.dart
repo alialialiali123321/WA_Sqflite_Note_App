@@ -16,8 +16,7 @@ class _HomePageState extends State<HomePage> {
   List notes = [];
 
   void readData() async {
-    List<Map<String, Object?>> response =
-        await sqlDb.readData('SELECT * FROM Notes');
+    List<Map<String, Object?>> response = await sqlDb.readData(table: 'Notes');
     notes.addAll(response);
     isLoading = false;
     if (mounted) {
@@ -80,7 +79,9 @@ class _HomePageState extends State<HomePage> {
                             IconButton(
                               onPressed: () async {
                                 int response = await sqlDb.deleteData(
-                                    'DELETE FROM Notes WHERE id = ${notes[index]['id']}');
+                                  table: 'Notes',
+                                  where: 'id = ${notes[index]['id']}',
+                                );
                                 if (response != 0) {
                                   setState(() {
                                     notes.removeWhere((element) =>

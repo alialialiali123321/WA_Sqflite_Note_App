@@ -96,15 +96,17 @@ class _EditNoteState extends State<EditNote> {
                     height: 35,
                     child: const Text('Edit Note'),
                     onPressed: () async {
-                      int response = await sqlDb.updateData('''
-                          UPDATE "Notes" SET
-                          "note" = "${note.text}",
-                          "title" = "${title.text}",
-                          "color" = "${color.text}"
-                          WHERE id = "${widget.id}"
-                          ''');
+                      int response = await sqlDb.updateData(
+                        table: 'Notes',
+                        values: {
+                          'title': title.text,
+                          'note': note.text,
+                          'color': color.text,
+                        },
+                        where: 'id = ${widget.id}',
+                      );
                       if (response != 0) {
-                        // ignore: use_build_context_synchronously
+                        if (!mounted) return;
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const HomePage()),

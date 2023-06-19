@@ -77,12 +77,16 @@ class _AddNoteState extends State<AddNote> {
                     height: 35,
                     child: const Text('Add Note'),
                     onPressed: () async {
-                      int response = await sqlDb.insertData('''
-                          INSERT INTO "Notes" ("note", "title", "color")
-                          VALUES ("${note.text}", "${title.text}", "${color.text}")
-                          ''');
-                      if (response > 0) {
-                        // ignore: use_build_context_synchronously
+                      int response = await sqlDb.insertData(
+                        table: 'Notes',
+                        values: {
+                          'note': note.text,
+                          'title': title.text,
+                          'color': color.text,
+                        },
+                      );
+                      if (response != 0) {
+                        if (!mounted) return;
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const HomePage()),

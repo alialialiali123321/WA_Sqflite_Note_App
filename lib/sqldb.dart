@@ -64,27 +64,34 @@ class SqlDb {
         ''');
   }
 
-  readData(String sql) async {
+  readData({required String table}) async {
     Database? database = await db;
-    List<Map<String, Object?>> response = await database!.rawQuery(sql);
+    List<Map<String, Object?>> response = await database!.query(table);
     return response;
   }
 
-  insertData(String sql) async {
+  insertData({
+    required String table,
+    required Map<String, Object?> values,
+  }) async {
     Database? database = await db;
-    int response = await database!.rawInsert(sql);
+    int response = await database!.insert(table, values);
     return response;
   }
 
-  updateData(String sql) async {
+  updateData({
+    required String table,
+    required Map<String, Object?> values,
+    required String where,
+  }) async {
     Database? database = await db;
-    int response = await database!.rawUpdate(sql);
+    int response = await database!.update(table, values, where: where);
     return response;
   }
 
-  deleteData(String sql) async {
+  deleteData({required String table, required String where}) async {
     Database? database = await db;
-    int response = await database!.rawDelete(sql);
+    int response = await database!.delete(table, where: where);
     return response;
   }
 
