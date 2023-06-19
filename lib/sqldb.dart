@@ -25,17 +25,38 @@ class SqlDb {
     return database;
   }
 
+  //? For multiple tables
   _onCreate(Database db, int version) async {
-    await db.execute('''
+    Batch batch = db.batch();
+    batch.execute('''
         CREATE TABLE Notes (
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         "title" TEXT NOT NULL,
         "note" TEXT NOT NULL,
         "color" TEXT NOT NULL
         )''');
+
+    //     batch.execute('''
+    // CREATE TABLE nameDB (
+    // "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    // "nameC" TEXT NOT NULL
+    // )''');
+
+    await batch.commit();
   }
 
-  // When the version number is changed
+  //? For one table
+  // _onCreate(Database db, int version) async {
+  //   await db.execute('''
+  //       CREATE TABLE Notes (
+  //       "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  //       "title" TEXT NOT NULL,
+  //       "note" TEXT NOT NULL,
+  //       "color" TEXT NOT NULL
+  //       )''');
+  // }
+
+  //? When the version number is changed
   _onUpgrade(Database db, int oldVersion, int newVersion) async {
     await db.execute('''
         ALTER TABLE Notes ADD COLUMN
