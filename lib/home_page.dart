@@ -1,3 +1,4 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/edit_note.dart';
 
@@ -12,13 +13,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   SqlDb sqlDb = SqlDb();
-  bool isLoading = true;
   List notes = [];
 
   void readData() async {
     List<Map<String, Object?>> response = await sqlDb.readData(table: 'Notes');
     notes.addAll(response);
-    isLoading = false;
     if (mounted) {
       setState(() {});
     }
@@ -37,71 +36,73 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         title: const Text('Home Page'),
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView(
-              children: [
-                // ElevatedButton(
-                //     onPressed: () {
-                //       sqlDb.deleteDb();
-                //     },
-                //     child: const Text('Delete')),
-                ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: notes.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      child: ListTile(
-                        title: Text('${notes[index]['title']}'),
-                        subtitle: Text('${notes[index]['note']}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => EditNote(
-                                    id: notes[index]['id'],
-                                    note: notes[index]['note'],
-                                    title: notes[index]['title'],
-                                    color: notes[index]['color'],
-                                  ),
-                                ));
-                              },
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Colors.blue,
+      body: ConditionalBuilder(
+        condition: notes.isNotEmpty,
+        builder: (context) => ListView(
+          children: [
+            // ElevatedButton(
+            //     onPressed: () {
+            //       sqlDb.deleteDb();
+            //     },
+            //     child: const Text('Delete')),
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: notes.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: ListTile(
+                    title: Text('${notes[index]['title']}'),
+                    subtitle: Text('${notes[index]['note']}'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => EditNote(
+                                id: notes[index]['id'],
+                                note: notes[index]['note'],
+                                title: notes[index]['title'],
+                                color: notes[index]['color'],
                               ),
-                            ),
-                            IconButton(
-                              onPressed: () async {
-                                int response = await sqlDb.deleteData(
-                                  table: 'Notes',
-                                  where: 'id = ${notes[index]['id']}',
-                                );
-                                if (response != 0) {
-                                  setState(() {
-                                    notes.removeWhere((element) =>
-                                        element['id'] == notes[index]['id']);
-                                  });
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
+                            ));
+                          },
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                )
-              ],
-            ),
+                        IconButton(
+                          onPressed: () async {
+                            int response = await sqlDb.deleteData(
+                              table: 'Notes',
+                              where: 'id = ${notes[index]['id']}',
+                            );
+                            if (response != 0) {
+                              setState(() {
+                                notes.removeWhere((element) =>
+                                    element['id'] == notes[index]['id']);
+                              });
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
+        fallback: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).pushNamed('AddNote');
